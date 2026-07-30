@@ -85,6 +85,28 @@ class _MainAppState extends State<MainApp> {
               token: _token,
             )
           : const SignInPage(),
+      routes: {
+        '/signin': (ctx) => const SignInPage(),
+        '/home': (ctx) {
+          // Наименованный маршрут для возврата на главный экран.
+          // Загружаем сохранённые данные из SharedPreferences перед созданием HomeShellPage.
+          return FutureBuilder(
+            future: SharedPreferences.getInstance(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return const Scaffold(body: Center(child: CircularProgressIndicator()));
+              }
+              final prefs = snapshot.data as SharedPreferences;
+              final role = prefs.getString('role') ?? 'user';
+              final name = prefs.getString('name') ?? 'Пользователь';
+              final email = prefs.getString('email') ?? '';
+              final phone = prefs.getString('phone') ?? '';
+              final token = prefs.getInt('token') ?? 9991;
+              return HomeShellPage(role: role, name: name, email: email, phone: phone, token: token);
+            },
+          );
+        }
+      },
     );
   }
 }

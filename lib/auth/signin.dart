@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
-import '../home/base.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -102,17 +101,7 @@ class _SignInPageState extends State<SignInPage> {
       await prefs.setString('story', story);
       await prefs.setInt('token', token);
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => HomeShellPage(
-            role: role,
-            name: name,
-            email: email,
-            phone: phone,
-            token: token,
-          ),
-        ),
-      );
+      Navigator.of(context).pushReplacementNamed('/home');
     } catch (error) {
       if (!mounted) {
         return;

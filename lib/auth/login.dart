@@ -83,17 +83,7 @@ class _LoginPageState extends State<LoginPage> {
       await prefs.setString('story', '');
       await prefs.setInt('token', _defaultToken);
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (_) => ProfilePage(
-            role: _defaultRole,
-            name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            phone: _phoneController.text.trim(),
-            token: _defaultToken,
-          ),
-        ),
-      );
+      Navigator.of(context).pushReplacementNamed('/home');
     } catch (error) {
       if (!mounted) {
         return;
