@@ -1,3 +1,4 @@
+import 'package:app/home/map.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -105,7 +106,8 @@ class _MainAppState extends State<MainApp> {
               return HomeShellPage(role: role, name: name, email: email, phone: phone, token: token);
             },
           );
-        }
+        },
+        // '/map': (ctx) => CastomMap()
       },
     );
   }

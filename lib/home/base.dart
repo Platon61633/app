@@ -1,3 +1,4 @@
+import 'package:app/home/map.dart';
 import 'package:flutter/material.dart';
 
 import 'profile.dart';
@@ -48,10 +49,7 @@ class _HomeShellPageState extends State<HomeShellPage> {
           ),
         ),
         child: SafeArea(
-          child: IndexedStack(
-            index: _selectedIndex,
-            children: pages,
-          ),
+          child: IndexedStack(index: _selectedIndex, children: pages),
         ),
       ),
       bottomNavigationBar: NavigationBar(
@@ -86,16 +84,19 @@ class ServicesPage extends StatelessWidget {
         title: 'Покос',
         subtitle: 'Профессиональная услуга по покосу травы и кустарников',
         icon: Icons.grass_rounded,
+        Goto: MapScreen(),
       ),
       _ServiceCard(
         title: 'Спил',
         subtitle: 'Удаление деревьев и безопасный спил стволов',
         icon: Icons.forest_rounded,
+        Goto: MapScreen(),
       ),
       _ServiceCard(
         title: 'Строй',
         subtitle: 'Строительные работы и благоустройство участка',
         icon: Icons.construction_rounded,
+        Goto: MapScreen(),
       ),
     ];
 
@@ -127,10 +128,12 @@ class ServicesPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              ...services.map((service) => Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: service,
-                  )),
+              ...services.map(
+                (service) => Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: service,
+                ),
+              ),
             ],
           ),
         ),
@@ -144,53 +147,64 @@ class _ServiceCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.icon,
+    required this.Goto
   });
 
   final String title;
   final String subtitle;
   final IconData icon;
+  final StatefulWidget Goto;
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: const Color(0xFF1F6F8B).withOpacity(0.12),
-                borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => Goto),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1F6F8B).withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(icon, size: 30, color: const Color(0xFF1F6F8B)),
               ),
-              child: Icon(icon, size: 30, color: const Color(0xFF1F6F8B)),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
+                    const SizedBox(height: 4),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey.shade700,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
