@@ -24,7 +24,7 @@ class _MainAppState extends State<MainApp> {
   String _email = '';
   String _phone = '';
   String _story = '';
-  int _token = 9991;
+  String? _token;
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _MainAppState extends State<MainApp> {
     final email = prefs.getString('email');
     final phone = prefs.getString('phone');
     final story = prefs.getString('story');
-    final token = prefs.getInt('token');
+    final token = prefs.getString('auth_token') ?? prefs.getString('token');
 
     if (!mounted) {
       return;
@@ -52,7 +52,7 @@ class _MainAppState extends State<MainApp> {
       _email = email ?? '';
       _phone = phone ?? '';
       _story = story ?? '';
-      _token = token ?? 9991;
+      _token = token;
       _isLoading = false;
     });
   }
@@ -102,7 +102,7 @@ class _MainAppState extends State<MainApp> {
               final name = prefs.getString('name') ?? 'Пользователь';
               final email = prefs.getString('email') ?? '';
               final phone = prefs.getString('phone') ?? '';
-              final token = prefs.getInt('token') ?? 9991;
+              final token = prefs.getString('auth_token') ?? prefs.getString('token');
               return HomeShellPage(role: role, name: name, email: email, phone: phone, token: token);
             },
           );

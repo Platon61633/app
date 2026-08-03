@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import '../auth/signin.dart';
+import '../services/auth_service.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({
@@ -17,7 +16,7 @@ class ProfilePage extends StatelessWidget {
   final String name;
   final String email;
   final String phone;
-  final int token;
+  final String? token;
 
   @override
   Widget build(BuildContext context) {
@@ -136,23 +135,6 @@ class ProfilePage extends StatelessWidget {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              const SizedBox(height: 18),
-                              const Text(
-                                'Token',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black54,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                token.toString(),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
                             ],
                           ),
                         ),
@@ -161,13 +143,8 @@ class ProfilePage extends StatelessWidget {
                           height: 50,
                           child: ElevatedButton.icon(
                             onPressed: () async {
-                              final prefs = await SharedPreferences.getInstance();
-                              await prefs.remove('role');
-                              await prefs.remove('name');
-                              await prefs.remove('email');
-                              await prefs.remove('phone');
-                              await prefs.remove('story');
-                              await prefs.remove('token');
+                              // clear stored auth
+                              await AuthService.clear();
 
                               if (!context.mounted) {
                                 return;

@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/profile.dart';
+import '../services/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,7 +16,6 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   static const _defaultRole = 'user';
-  static const _defaultToken = 9991;
   static final Uri _registerUri = Uri.parse('http://192.168.1.53:5000/register');
 
   final _formKey = GlobalKey<FormState>();
@@ -75,13 +75,19 @@ class _LoginPageState extends State<LoginPage> {
         return;
       }
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('role', _defaultRole);
-      await prefs.setString('name', _nameController.text.trim());
-      await prefs.setString('email', _emailController.text.trim());
-      await prefs.setString('phone', _phoneController.text.trim());
-      await prefs.setString('story', '');
-      await prefs.setInt('token', _defaultToken);
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      // Expected response contains token and user object
+      final token = data['token'] as String?;
+      final user = data['user'] as Map<String, dynamic>?;
+
+      if (token == null || user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Некорректный ответ сервера')),
+        );
+        return;
+      }
+
+      await AuthService.saveAuth(token: token, user: user);
 
       Navigator.of(context).pushReplacementNamed('/home');
     } catch (error) {

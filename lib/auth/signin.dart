@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
+import '../services/auth_service.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -15,7 +16,6 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   static const _defaultRole = 'user';
-  static const _defaultToken = 9991;
   static final Uri _loginUri = Uri.parse('http://192.168.1.53:5000/login');
 
   final _formKey = GlobalKey<FormState>();
@@ -81,25 +81,15 @@ class _SignInPageState extends State<SignInPage> {
       }
 
       final userData = data['user'];
-      Map<String, dynamic> user = {};
-      if (userData is Map) {
-        user = Map<String, dynamic>.from(userData);
+      final token = data['token'] as String?;
+      if (token == null || userData == null || userData is! Map) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Некорректный ответ сервера')),
+        );
+        return;
       }
 
-      final role = (data['role'] ?? user['role'])?.toString() ?? _defaultRole;
-      final name = (data['name'] ?? user['name'])?.toString() ?? 'Пользователь';
-      final email = (data['email'] ?? user['email'] ?? _emailController.text.trim())?.toString() ?? _emailController.text.trim();
-      final phone = (data['phone'] ?? user['phone'])?.toString() ?? '';
-      final story = (data['story'] ?? user['story'])?.toString() ?? '';
-      final token = int.tryParse((data['token'] ?? user['token'])?.toString() ?? '') ?? _defaultToken;
-
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('role', role);
-      await prefs.setString('name', name);
-      await prefs.setString('email', email);
-      await prefs.setString('phone', phone);
-      await prefs.setString('story', story);
-      await prefs.setInt('token', token);
+      await AuthService.saveAuth(token: token, user: Map<String, dynamic>.from(userData));
 
       Navigator.of(context).pushReplacementNamed('/home');
     } catch (error) {
