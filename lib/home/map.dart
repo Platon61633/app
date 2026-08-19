@@ -244,6 +244,7 @@ class MapSelectionResult {
     required this.price,
     required this.address,
     required this.note,
+    required this.comment,
     required this.scheduledAt,
   });
 
@@ -252,6 +253,7 @@ class MapSelectionResult {
   final int price;
   final String address;
   final String note;
+  final String comment;
   final DateTime scheduledAt;
 
   Map<String, dynamic> toOrderItem() {
@@ -260,6 +262,7 @@ class MapSelectionResult {
       'work': area,
       'adres': address,
       'note': note,
+      'comment': comment.isEmpty ? null : comment,
       'time': scheduledAt.toString(),
       'cost': price,
     };
@@ -311,6 +314,7 @@ extension on _MapScreenState {
   void _showConfirmModal(BuildContext context) async {
     final area = _polygonAreaMeters(_hull);
     final price = (area * 5).round();
+    final commentController = TextEditingController();
 
     await showModalBottomSheet(
       context: context,
@@ -400,6 +404,21 @@ extension on _MapScreenState {
                       ),
                     ),
                     const SizedBox(height: 12),
+                    TextField(
+                      controller: commentController,
+                      maxLines: 3,
+                      decoration: InputDecoration(
+                        labelText: 'Комментарий (необязательно)',
+                        hintText: 'Например: осторожно, есть теплица',
+                        filled: true,
+                        fillColor: Theme.of(ctx).colorScheme.surfaceContainerHighest.withOpacity(0.55),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
@@ -412,16 +431,28 @@ extension on _MapScreenState {
 
                               final pickedDateTime = selectedDateTime;
                               final addr = _selectionCenterLabel(_points);
-                              final note = _selectedPointsNote(_points);
+                              // Сохраняем именно вершины подтверждённого
+                              // многоугольника (_hull), а не все точки тапа —
+                              // так координаты в заказе точно совпадают с
+                              // площадью, которую пользователь видел и
+                              // подтвердил на карте.
+                              final note = _selectedPointsNote(_hull);
                               final selection = MapSelectionResult(
                                 serviceName: widget.serviceName,
                                 area: area.round(),
                                 price: price,
                                 address: addr,
                                 note: note,
+                                comment: commentController.text.trim(),
                                 scheduledAt: pickedDateTime!,
                               );
 
+                              // Снимаем фокус с поля комментария ДО закрытия
+                              // листа: если клавиатура ещё открыта в момент
+                              // Navigator.pop, Flutter иногда падает с
+                              // "_dependents.isEmpty" / "build dirty widget
+                              // in the wrong build scope".
+                              FocusScope.of(context).unfocus();
                               Navigator.of(ctx).pop();
                               if (mounted) {
                                 Navigator.of(context).pop(selection);
@@ -441,6 +472,8 @@ extension on _MapScreenState {
         );
       },
     );
+
+    commentController.dispose();
   }
 }
 

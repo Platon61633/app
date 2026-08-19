@@ -6,6 +6,7 @@ class AuthService {
   static const _keyUserName = 'user_name';
   static const _keyUserPhone = 'user_phone';
   static const _keyUserRole = 'user_role';
+  static const _keyUserEmail = 'user_email';
 
   static Future<void> saveAuth({required String token, required Map<String, dynamic> user}) async {
     final prefs = await SharedPreferences.getInstance();
@@ -14,6 +15,7 @@ class AuthService {
     if (user.containsKey('name')) await prefs.setString(_keyUserName, user['name'] as String);
     if (user.containsKey('phone')) await prefs.setString(_keyUserPhone, user['phone'] as String);
     if (user.containsKey('role')) await prefs.setString(_keyUserRole, user['role'] as String);
+    if (user.containsKey('email')) await prefs.setString(_keyUserEmail, user['email'] as String);
   }
 
   static Future<String?> getToken() async {
@@ -37,5 +39,6 @@ class AuthService {
     await prefs.remove(_keyUserName);
     await prefs.remove(_keyUserPhone);
     await prefs.remove(_keyUserRole);
+    await prefs.remove(_keyUserEmail);
   }
 }

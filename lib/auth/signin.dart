@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
 import '../services/auth_service.dart';
+import '../services/api_config.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -16,12 +17,13 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   static const _defaultRole = 'user';
-  static final Uri _loginUri = Uri.parse('http://192.168.1.53:5000/login');
+  static final Uri _loginUri = ApiConfig.uri('/login');
 
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isSubmitting = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
@@ -58,9 +60,7 @@ class _SignInPageState extends State<SignInPage> {
 
       if (response.statusCode < 200 || response.statusCode >= 300) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ошибка входа: ${response.statusCode}'),
-          ),
+          SnackBar(content: Text('Ошибка входа: ${response.statusCode}')),
         );
         return;
       }
@@ -79,8 +79,9 @@ class _SignInPageState extends State<SignInPage> {
           data = {};
         }
       }
-
+      print(data);
       final userData = data['user'];
+
       final token = data['token'] as String?;
       if (token == null || userData == null || userData is! Map) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -89,7 +90,10 @@ class _SignInPageState extends State<SignInPage> {
         return;
       }
 
-      await AuthService.saveAuth(token: token, user: Map<String, dynamic>.from(userData));
+      await AuthService.saveAuth(
+        token: token,
+        user: Map<String, dynamic>.from(userData),
+      );
 
       Navigator.of(context).pushReplacementNamed('/home');
     } catch (error) {
@@ -190,11 +194,24 @@ class _SignInPageState extends State<SignInPage> {
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _passwordController,
-                            obscureText: true,
+                            obscureText: _obscurePassword,
                             textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
                               labelText: 'Пароль',
                               prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                ),
+                                tooltip: _obscurePassword ? 'Показать пароль' : 'Скрыть пароль',
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),

@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../home/profile.dart';
 import '../services/auth_service.dart';
+import '../services/api_config.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,7 +17,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   static const _defaultRole = 'user';
-  static final Uri _registerUri = Uri.parse('http://192.168.1.53:5000/register');
+  static final Uri _registerUri = ApiConfig.uri('/register');
 
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
@@ -25,6 +26,8 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   bool _isSubmitting = false;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -225,11 +228,24 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _passwordController,
-                            obscureText: true,
+                            obscureText: _obscurePassword,
                             textInputAction: TextInputAction.next,
                             decoration: InputDecoration(
                               labelText: 'Пароль',
                               prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                ),
+                                tooltip: _obscurePassword ? 'Показать пароль' : 'Скрыть пароль',
+                                onPressed: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
@@ -247,11 +263,24 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(height: 16),
                           TextFormField(
                             controller: _confirmPasswordController,
-                            obscureText: true,
+                            obscureText: _obscureConfirmPassword,
                             textInputAction: TextInputAction.done,
                             decoration: InputDecoration(
                               labelText: 'Повторите пароль',
                               prefixIcon: const Icon(Icons.lock_reset_outlined),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureConfirmPassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                ),
+                                tooltip: _obscureConfirmPassword ? 'Показать пароль' : 'Скрыть пароль',
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureConfirmPassword = !_obscureConfirmPassword;
+                                  });
+                                },
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
